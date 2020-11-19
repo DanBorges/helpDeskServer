@@ -42,7 +42,6 @@ public class UserController {
 	public ResponseEntity<Response<User>> create(HttpServletRequest request, 
 												@RequestBody User user,
 												BindingResult result) {
-		
 		Response<User> response = new Response<User>();
 		try {
 			validadeCreateUser(user, result);
@@ -50,11 +49,9 @@ public class UserController {
 				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 				return ResponseEntity.badRequest().body(response);
 			}
-			
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
 			User userPersisted = userService.createOrUpdadte(user);
 			response.setData(userPersisted);
-			
 		} catch (DuplicateKeyException e) {
 			response.getErrors().add("Email already exist");
 			return ResponseEntity.badRequest().body(response);
@@ -62,7 +59,6 @@ public class UserController {
 			response.getErrors().add(e.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}
-		
 		return ResponseEntity.ok(response);
 	}
 	
@@ -73,7 +69,6 @@ public class UserController {
 		}
 		
 	}
-	
 	
 	@PutMapping
 	@PreAuthorize("hasAnyRole('ADMIN')")
@@ -105,23 +100,21 @@ public class UserController {
 		if (user.getEmail() == null) {
 			result.addError(new ObjectError("User", "Email no information"));
 		}
+
 	}
-	
 	
 	@GetMapping(value = "{id}")
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<Response<User>> findById(@PathVariable("id") String id) {
 		Response<User> response = new Response<User>();
 		Optional<User> user = userService.findById(id);
-		
 		if(user == null) {
 			response.getErrors().add("Register Not Found" + id);
 			return ResponseEntity.badRequest().body(response);
 		}
-		
 		response.setData(user.get());
-		
 		return ResponseEntity.ok(response);
+
 	}
 	
 	@DeleteMapping(value = "{id}")
@@ -138,16 +131,14 @@ public class UserController {
 		
 	}
 	
-	
 	@GetMapping(value = "{page}/{count}")
 	public ResponseEntity<Response<Page<User>>> findAll (@PathVariable int page,
 														@PathVariable int count) {
-		
 		Response<Page<User>> response = new Response<Page<User>>();
 		Page<User> users = userService.findAll(page, count);
 		response.setData(users);
 		return ResponseEntity.ok(response);
 		
-		
 	}
+
 }
